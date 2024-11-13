@@ -78,7 +78,7 @@ def do_cop ():
 
 def do_imm ():
 	T = F2 ? zext (imm) : sext (imm)	# logic or adder
-	v = ALU (S, T, C3, C1, C0, 1)
+	v = ALU (S, T, C[2:1] == 1, C2, C1, C0, 1)
 
 	return wb (PC_next, rt, 0xF, v)
 
@@ -108,7 +108,7 @@ def do_special ():
 	else:     return do_shift ()
 
 def do_alu (LU = 0):
-	v = ALU (S, T, F3, F1, F0, 0)
+	v = ALU (S, T, F3, F2, F1, F0, 0)
 
 	return wb (PC_next, rd, 0xF, v)
 
