@@ -65,7 +65,8 @@ module mips_ic (
 endmodule
 
 module mips_rf (
-	input clock, input [31:0] op, RN, output reg [31:0] S, T, I, EN
+	input clock, input [31:0] op, input branch, input [31:0] RN,
+	output reg [31:0] S, T, I, EN
 );
 	wire [4:0]  rs  = op[25:21];
 	wire [4:0]  rt  = op[20:16];
@@ -73,34 +74,36 @@ module mips_rf (
 
 	reg [31:0] GPR[31];
 
-	always @(posedge clock) begin
-		S  <= GPR[rs];
-		T  <= GPR[rt];
-		I  <= {{16 {imm[15]}}, imm};
-		EN <= RN;
-	end
+	always @(posedge clock)
+		if (!branch) begin
+			S  <= GPR[rs];
+			T  <= GPR[rt];
+			I  <= {{16 {imm[15]}}, imm};
+			EN <= RN;
+		end
 endmodule
 
 module mips_id (
-	input clock, input [31:0] op,
+	input clock, input [31:0] op, input branch,
 	output reg [4:0] sa, output reg [6:0] func, output reg imm
 );
 	wire [5:0] C  = op[31:26];
 	wire [4:0] SA = op[10:6];
 	wire [5:0] F  = op[5:0];
 
-	always @(posedge clock) begin
-		sa   <= SA;
-		func <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
-			       C[3] ? {C[2:1] == 1, 2'b0, C[2:0]} : F};
-		imm  <= C[5] | C[3];
-	end
+	always @(posedge clock)
+		if (!branch) begin
+			sa   <= SA;
+			func <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
+				       C[3] ? {C[2:1] == 1, 2'b0, C[2:0]} : F};
+			imm  <= C[5] | C[3];
+		end
 endmodule
 
 module mips_ex (
 	input clock,
 	input [31:0] S, T, I, PC, input [4:0] sa, input [6:0] F, input i,
-	output reg [31:0] D
+	output reg [31:0] D, output reg br
 );
 	wire [31:0] AD, XD;
 	wire ov;
@@ -108,8 +111,10 @@ module mips_ex (
 	mips_alu   A (F, S, i ? I : T, AD, ov);
 	mips_shift X (F, S, T, sa, XD);
 
-	always @(posedge clock)
+	always @(posedge clock) begin
 		D  <= F[5] ? AD : XD;
+		br <= 0;
+	end
 endmodule
 
 module mips_core (
@@ -118,12 +123,12 @@ module mips_core (
 	wire [4:0] sa;
 	wire [6:0] F;
 	wire [31:0] S, T, I, D, RN, EN;
-	wire i, ov;
+	wire br, i, ov;
 
 	mips_ic IC (clock, PC, RN);
-	mips_rf RF (clock, op, RN, S, T, I, EN);
-	mips_id ID (clock, op, sa, F, i);
-	mips_ex EX (clock, S, T, I, EN, sa, F, i, D);
+	mips_rf RF (clock, op, br, RN, S, T, I, EN);
+	mips_id ID (clock, op, br, sa, F, i);
+	mips_ex EX (clock, S, T, I, EN, sa, F, i, D, br);
 endmodule
 
 `endif  /* CPU_MIPS_I_V */
