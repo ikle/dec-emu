@@ -90,10 +90,10 @@ module mips_id (
 	wire [5:0] F  = op[5:0];
 
 	always @(posedge clock) begin
-		sa     <= SA;
-		func   <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
-				 C[3] ? {C[2:1] == 1, 2'b0, C[2:0]} : F};
-		imm    <= C[5] | C[3];
+		sa   <= SA;
+		func <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
+			       C[3] ? {C[2:1] == 1, 2'b0, C[2:0]} : F};
+		imm  <= C[5] | C[3];
 	end
 endmodule
 
