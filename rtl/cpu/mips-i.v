@@ -83,7 +83,7 @@ endmodule
 
 module mips_id (
 	input clock, input [31:0] op,
-	output reg [4:0] sa, output reg [6:0] alu_op, output reg imm
+	output reg [4:0] sa, output reg [6:0] func, output reg imm
 );
 	wire [5:0] C  = op[31:26];
 	wire [4:0] SA = op[10:6];
@@ -91,7 +91,7 @@ module mips_id (
 
 	always @(posedge clock) begin
 		sa     <= SA;
-		alu_op <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
+		func   <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
 				 C[3] ? {C[2:1] == 1, 2'b0, C[2:0]} : F};
 		imm    <= C[5] | C[3];
 	end
