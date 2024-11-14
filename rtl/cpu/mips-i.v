@@ -74,10 +74,11 @@ module mips_rf (
 endmodule
 
 module mips_id (
-	input clock, input [31:0] op, output reg [6:0] alu_op, output reg imm
+	input clock, input [31:0] op,
+	output reg [6:0] alu_op, output reg imm
 );
-	wire [5:0] C = op[31:26];
-	wire [5:0] F = op[5:0];
+	wire [5:0] C  = op[31:26];
+	wire [5:0] F  = op[5:0];
 
 	always @(posedge clock) begin
 		alu_op <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
@@ -87,13 +88,14 @@ module mips_id (
 endmodule
 
 module mips_ex (
-	input clock, input [31:0] S, T, I, PC, input [6:0] F, input i,
+	input clock,
+	input [31:0] S, T, I, PC, input [6:0] F, input i,
 	output reg [31:0] D
 );
 	wire [31:0] AD;
 	wire ov;
 
-	mips_alu A (F, S, i ? I : T, AD, ov);
+	mips_alu   A (F, S, i ? I : T, AD, ov);
 
 	always @(posedge clock)
 		D  <= AD;
