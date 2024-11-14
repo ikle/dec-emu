@@ -10,7 +10,7 @@
 `define CPU_MIPS_I_V  1
 
 module mips_adder (
-	input [4:0] F, input [31:0] S, T, output [31:0] q, output co, ov
+	input [6:0] F, input [31:0] S, T, output [31:0] q, output co, ov
 );
 	wire [33:0] s = {1'b0, S, F[1]} + {1'b0, F[1] ? ~T : T, F[1]};
 
@@ -20,16 +20,16 @@ module mips_adder (
 endmodule
 
 module mips_logic (
-	input [4:0] F, input [31:0] S, T, output [31:0] q
+	input [6:0] F, input [31:0] S, T, output [31:0] q
 );
-	wire LU = F[4];  /* load upper */
+	wire LU = F[6];  /* load upper */
 
 	assign q = F[1] ? (F[0] ? LU ? T << 16 : ~(S | T) : S ^ T) :
 			  (F[0] ? S | T : S & T);
 endmodule
 
 module mips_alu (
-	input [4:0] F, input [31:0] S, T, output [31:0] q, output ov
+	input [6:0] F, input [31:0] S, T, output [31:0] q, output ov
 );
 	wire [31:0] aq, lq, o;
 	wire aco, aov, lt;
@@ -74,20 +74,20 @@ module mips_rf (
 endmodule
 
 module mips_id (
-	input clock, input [31:0] op, output reg [4:0] alu_op, output reg imm
+	input clock, input [31:0] op, output reg [6:0] alu_op, output reg imm
 );
 	wire [5:0] C = op[31:26];
 	wire [5:0] F = op[5:0];
 
 	always @(posedge clock) begin
-		alu_op <= {C[3], C[5] ? 4'b0001 /* addu for VA */ :
-				 C[3] ? {C[2:1] == 1, C[2:0]} : F[3:0]};
+		alu_op <= {C[3], C[5] ? 6'b100001 /* addu for VA */ :
+				 C[3] ? {C[2:1] == 1, 2'b0, C[2:0]} : F};
 		imm    <= C[5] | C[3];
 	end
 endmodule
 
 module mips_ex (
-	input clock, input [31:0] S, T, I, PC, input [4:0] F, input i,
+	input clock, input [31:0] S, T, I, PC, input [6:0] F, input i,
 	output reg [31:0] D
 );
 	wire [31:0] AD;
@@ -102,7 +102,7 @@ endmodule
 module mips_core (
 	input clock, output [31:0] PC, input [31:0] op
 );
-	wire [4:0] F;
+	wire [6:0] F;
 	wire [31:0] S, T, I, D, RN, EN;
 	wire i, ov;
 
