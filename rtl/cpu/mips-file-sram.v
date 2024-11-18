@@ -29,8 +29,8 @@ module mips_file (
 		if (we[3])  T3[rd] <= D[31:24];
 	end
 
-	assign S = rs == 5'b0 ? 32'b0 : {S3[rs], S2[rs], S1[rs], S0[rs]};
-	assign T = rt == 5'b0 ? 32'b0 : {T3[rt], T2[rt], T1[rt], T0[rt]};
+	assign S = (rs == 5'b0) ? 32'b0 : {S3[rs], S2[rs], S1[rs], S0[rs]};
+	assign T = (rt == 5'b0) ? 32'b0 : {T3[rt], T2[rt], T1[rt], T0[rt]};
 endmodule
 
 `endif  /* CPU_MIPS_FILE_SRAM_V */
