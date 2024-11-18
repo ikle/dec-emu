@@ -9,6 +9,8 @@
 `ifndef CPU_MIPS_I_V
 `define CPU_MIPS_I_V  1
 
+`include "cpu/mips-file.v"
+
 module mips_adder (
 	input [6:0] F, input [31:0] S, T, output [31:0] q, output co, ov
 );
@@ -72,12 +74,14 @@ module mips_rf (
 	wire [4:0]  rt  = op[20:16];
 	wire [15:0] imm = op[15:0];
 
-	reg [31:0] GPR[31];
+	wire [31:0] s, t;
+
+	mips_file F (clock, , , , rs, rt, s, t);
 
 	always @(posedge clock)
 		if (!branch) begin
-			S  <= GPR[rs];
-			T  <= GPR[rt];
+			S  <= s;
+			T  <= t;
 			I  <= {{16 {imm[15]}}, imm};
 			EN <= RN;
 		end
