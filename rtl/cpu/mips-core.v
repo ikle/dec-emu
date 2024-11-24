@@ -383,10 +383,7 @@ module mips_core (
 	mips_mem MEM (clock, AA, ER, SM, LM, SE, DA, we, DO, re, DI, MR);
 
 	always @(posedge clock)
-		MT <= ET;
-
-	always @(posedge clock)
-		{WT, WR} <= {MT, MR};
+		{MT, WT, WR} <= {ET, MT, MR};
 endmodule
 
 `endif  /* CPU_MIPS_CORE_V */
