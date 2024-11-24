@@ -281,7 +281,8 @@ module mips_pipe_xfer (
 	input [31:0] S, T,				/* fetched vals	*/
 	output reg [31:0] result,			/* link value	*/
 	output reg [4:0] target,			/* save to	*/
-	output reg SV, LV
+	output reg [3:0] SM, LM,			/* wr/rd mask	*/
+	output reg SE					/* sign-extend	*/
 );
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rt = op[20:16];
@@ -293,11 +294,49 @@ module mips_pipe_xfer (
 	always @(posedge clock) begin
 		result  <= SO ? T : 32'b0;
 		target  <= LO ? rt : 0;
-		SV      <= SO;
-		LV      <= LO;
+		SM      <= SO ? C[1] ? 15 : C[0] ? 3 : 1 : 0;
+		LM      <= LO ? C[1] ? 15 : C[0] ? 3 : 1 : 0;
+		SE      <= !C[2];
 	end
 
 	/* EX stage is empty: just pass results from ID stage */
+endmodule
+
+/*
+ * MIPS I Memory Load and Store Stage
+ */
+module mips_mem (
+	input clock,
+	input [31:0] EA, ER,			/* EX address & result	*/
+	input [3:0] SM, LM,			/* EX store & load mask	*/
+	input SE,				/* EX sign-extend	*/
+	output [31:0] DA,			/* MEM data addr	*/
+	output [3:0] we, output [31:0] DO,	/* MEM data out		*/
+	output re, input [31:0] DI,		/* MEM data in		*/
+	output [31:0] MR			/* MEM result		*/
+);
+	reg [31:0] MA, MD; reg [3:0] WE, RE; reg se;	/* MEM inputs	*/
+
+	always @(posedge clock)
+		{MA, MD, WE, RE, se} <= {EA, ER, SM, LM, SE};
+
+	/* MEM stage, do not use wires from EX stage! */
+
+	wire [1:0] sa = MA[1:0];
+
+	assign DA = {MA[31:2], 2'b0};
+	assign we = WE << sa;
+	assign DO = MD << {sa, 3'b0};
+	assign re = RE[0];
+
+	wire [31:0] x = DI >> {sa, 3'b0};
+
+	wire [7:0] a = RE[0] ? x[ 7: 0] : 0;
+	wire [7:0] b = RE[1] ? x[15: 8] : {8 {a[7] & se}};
+	wire [7:0] c = RE[2] ? x[23:16] : {8 {b[7] & se}};
+	wire [7:0] d = RE[3] ? x[31:24] : {8 {b[7] & se}};
+
+	assign MR = re ? {d, c, b, a} : MD;
 endmodule
 
 /*
@@ -306,9 +345,9 @@ endmodule
 module mips_core (
 	input clock, input reset,
 	output reg [31:0] PC, input [31:0] op,		/* code bus	*/
-	output reg [31:0] DA,				/* data addr	*/
-	output reg we, output reg [31:0] DO,		/* data out 	*/
-	output reg re, input [31:0] DI			/* data in	*/
+	output [31:0] DA,				/* data addr	*/
+	output [3:0] we, output [31:0] DO,		/* data out 	*/
+	output re, input [31:0] DI			/* data in	*/
 );
 	wire [31:0] RO, RN;		/* ID/RF opcode and next PC	*/
 	wire [31:0] EA;				/* EX branch address	*/
@@ -325,25 +364,26 @@ module mips_core (
 
 	wire [31:0] JR, AR, LR, SR, BR, XR;	/* pipe results		*/
 	wire [4:0]  JT, AT, LT, ST, BT, XT;	/* pipe targets		*/
-	wire        JV, BV, SV, LV;		/* pipe signals		*/
+	wire        JV, BV;			/* pipe signals		*/
 	wire [31:0] JA, AA;			/* pipe addresses	*/
+	wire [3:0]  SM, LM; wire SE;		/* MEM function		*/
 
 	mips_pipe_jump   PJ (clock, reset, RO, RN, S, T, JR, JT, JV, JA);
 	mips_pipe_adder  PA (clock, reset, RO, RN, S, T, AR, AT, AA);
 	mips_pipe_logic  PL (clock, reset, RO, RN, S, T, LR, LT);
 	mips_pipe_shift  PS (clock, reset, RO, RN, S, T, SR, ST);
 	mips_pipe_branch PB (clock, reset, RO, RN, S, T, BR, BT, BV);
-	mips_pipe_xfer   PX (clock, reset, RO, RN, S, T, XR, XT, SV, LV);
+	mips_pipe_xfer   PX (clock, reset, RO, RN, S, T, XR, XT, SM, LM, SE);
 
 	assign ER = JR | AR | LR | SR | BR | XR;	/* EX result	*/
 	assign ET = JT | AT | LT | ST | BT | XT;	/* EX target	*/
 	assign EB = JV | BV;				/* EX branch	*/
 	assign EA = JA | AA;				/* EX address	*/
 
-	always @(posedge clock)
-		{MT, DA, we, DO, re} <= {ET, AA, SV, ER, LV};
+	mips_mem MEM (clock, AA, ER, SM, LM, SE, DA, we, DO, re, DI, MR);
 
-	assign MR = re ? DI : DO;
+	always @(posedge clock)
+		MT <= ET;
 
 	always @(posedge clock)
 		{WT, WR} <= {MT, MR};
