@@ -67,6 +67,8 @@ module mips_pipe_jump (
 	output reg branch,				/* do branch	*/
 	output reg [31:0] address			/* br/mem addr	*/
 );
+	/* ID stage */
+
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rd = op[15:11];
 	wire [5:0] F  = op[5:0];
@@ -107,6 +109,8 @@ module mips_pipe_adder (
 	output reg [4:0] target,			/* save to	*/
 	output [31:0] address				/* br/mem addr	*/
 );
+	/* ID stage */
+
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rt = op[20:16];
 	wire [4:0] rd = op[15:11];
@@ -118,8 +122,8 @@ module mips_pipe_adder (
 	wire addi = !reset & C[5:2] == 4'b0010;
 	wire mem  = !reset & C[5:5] == 1'b1;
 
-	wire BO = (regi | cond);
-	wire AO = (add | BO | addi | mem);
+	wire BO = (regi | cond);			/* branch op	*/
+	wire AO = (add | BO | addi | mem);		/* adder op	*/
 
 	reg AV, MV; reg [2:0] AF; reg [31:0] AS, AT;
 
@@ -161,6 +165,8 @@ module mips_pipe_logic (
 	output [31:0] result,				/* ALU result	*/
 	output reg [4:0] target				/* save to	*/
 );
+	/* ID stage */
+
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rt = op[20:16];
 	wire [4:0] rd = op[15:11];
@@ -169,7 +175,7 @@ module mips_pipe_logic (
 	wire log  = !reset & C[5:0] == 6'b000000 & F[5:2] == 4'b1001;
 	wire logi = !reset & C[5:2] == 4'b0011;
 
-	wire LO = (log | logi);
+	wire LO = (log | logi);				/* logic op	*/
 
 	reg LV; reg [2:0] LF; reg [31:0] LS, LT;
 
@@ -205,6 +211,8 @@ module mips_pipe_shift (
 	output [31:0] result,				/* ALU result	*/
 	output reg [4:0] target				/* save to	*/
 );
+	/* ID stage */
+
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rd = op[15:11];
 	wire [4:0] sa = op[10:6];
@@ -247,6 +255,8 @@ module mips_pipe_branch (
 	output reg [4:0] target,			/* save to	*/
 	output branch					/* do branch	*/
 );
+	/* ID stage */
+
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rt = op[20:16];
 	wire [5:0] F  = op[5:0];
@@ -254,8 +264,8 @@ module mips_pipe_branch (
 	wire regi = !reset & C[5:0] == 6'b000001;
 	wire cond = !reset & C[5:2] == 4'b0001;
 
-	wire BO = (regi | cond);
-	wire bl = regi & rt[4];			/* branch and link	*/
+	wire BO = (regi | cond);			/* branch op	*/
+	wire bl = regi & rt[4];				/* br. & link	*/
 
 	reg [2:0] BF; reg [31:0] BS, BT;
 
@@ -284,6 +294,8 @@ module mips_pipe_xfer (
 	output reg [3:0] SM, LM,			/* wr/rd mask	*/
 	output reg SE					/* sign-extend	*/
 );
+	/* ID stage */
+
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rt = op[20:16];
 	wire [5:0] F  = op[5:0];
