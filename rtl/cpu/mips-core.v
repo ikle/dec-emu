@@ -32,25 +32,17 @@ module mips_ic #(
 endmodule
 
 /*
- * MIPS I Register File Module
+ * MIPS I Register Fetch Module
  */
 module mips_rf (
 	input clock, input [31:0] op,
 	input [4:0] ET, input [31:0] ER,	/* EX  target and result */
 	input [4:0] MT, input [31:0] MR,	/* MEM target and result */
-	input [4:0] WT, input [31:0] WR,	/* WB  target and result */
+	output [4:0] rs, rt, input [31:0] GS, GT,  /* iface to reg. file */
 	output [31:0] S, T
 );
-	wire [4:0] rs = op[25:21];
-	wire [4:0] rt = op[20:16];
-
-	reg [31:0] R[31];
-
-	always @(posedge clock)
-		R[WT] <= WR;
-
-	wire [31:0] GS = (rs == 5'b0) ? 32'b0 : R[rs];
-	wire [31:0] GT = (rt == 5'b0) ? 32'b0 : R[rt];
+	assign rs = op[25:21];
+	assign rt = op[20:16];
 
 	assign S = (rs == ET) ? ER : (rs == MT) ? MR : GS;
 	assign T = (rt == ET) ? ER : (rt == MT) ? MR : GT;
@@ -356,6 +348,8 @@ endmodule
  */
 module mips_core (
 	input clock, input reset,
+	output reg [4:0] rd, output reg [31:0] GD,	/* file out	*/
+	output [4:0] rs, rt, input [31:0] GS, GT,	/* file in	*/
 	output reg [31:0] PC, input [31:0] op,		/* code bus	*/
 	output [31:0] DA,				/* data addr	*/
 	output [3:0] we, output [31:0] DO,		/* data out 	*/
@@ -369,10 +363,9 @@ module mips_core (
 
 	wire [4:0] ET; wire [31:0] ER;		/* EX  target & result	*/
 	reg  [4:0] MT; wire [31:0] MR;		/* MEM target & result	*/
-	reg  [4:0] WT; reg  [31:0] WR;		/* WB  target & result	*/
 	wire [31:0] S, T;			/* fetched values	*/
 
-	mips_rf RF (clock, RO, ET, ER, MT, MR, WT, WR, S, T);
+	mips_rf RF (clock, RO, ET, ER, MT, MR, rs, rt, GS, GT, S, T);
 
 	wire [31:0] JR, AR, LR, SR, BR, XR;	/* pipe results		*/
 	wire [4:0]  JT, AT, LT, ST, BT, XT;	/* pipe targets		*/
@@ -395,7 +388,7 @@ module mips_core (
 	mips_mem MEM (clock, AA, ER, SM, LM, SE, DA, we, DO, re, DI, MR);
 
 	always @(posedge clock)
-		{MT, WT, WR} <= {ET, MT, MR};
+		{MT, rd, GD} <= {ET, MT, MR};
 endmodule
 
 `endif  /* CPU_MIPS_CORE_V */
