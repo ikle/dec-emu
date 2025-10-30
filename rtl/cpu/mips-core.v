@@ -301,7 +301,7 @@ module mips_pipe_xfer (
 		target  <= LO ? rt : 0;
 		SM      <= SO ? BM : 0;
 		LM      <= LO ? BM : 0;
-		SE      <= !C[2];
+		SE      <= LO ? !C[2] : SE;
 	end
 
 	/* EX stage is empty: just pass results from ID stage */
