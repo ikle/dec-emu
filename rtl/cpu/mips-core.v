@@ -290,7 +290,6 @@ module mips_pipe_xfer (
 
 	wire [5:0] C  = op[31:26];
 	wire [4:0] rt = op[20:16];
-	wire [5:0] F  = op[5:0];
 
 	wire LO = !reset & C[5:3] == 3'b100;		/* load op	*/
 	wire SO = !reset & C[5:3] == 3'b101;		/* store op	*/
