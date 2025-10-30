@@ -10,9 +10,9 @@
 `define CPU_MIPS_CORE_V  1
 
 /*
- * MIPS I Instruction Cache Module
+ * MIPS I Instruction Fetch Module
  */
-module mips_ic #(
+module mips_if #(
 	parameter START = 32'b0
 ) (
 	input clock, reset,
@@ -360,7 +360,7 @@ module mips_core (
 	wire [31:0] EA;				/* EX branch address	*/
 	wire EB;				/* EX branch signal	*/
 
-	mips_ic IC (clock, reset, PC, op, RO, RN, EB, EA);
+	mips_if IC (clock, reset, PC, op, RO, RN, EB, EA);
 
 	wire [4:0] ET; wire [31:0] ER;		/* EX  target & result	*/
 	reg  [4:0] MT; wire [31:0] MR;		/* MEM target & result	*/
