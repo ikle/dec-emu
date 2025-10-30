@@ -1,7 +1,7 @@
 /*
  * MIPS I Core Module
  *
- * Copyright (c) 2021-2024 Alexei A. Smekalkine <ikle@ikle.ru>
+ * Copyright (c) 2021-2025 Alexei A. Smekalkine <ikle@ikle.ru>
  *
  * SPDX-License-Identifier: BSD-2-Clause
  */
@@ -295,11 +295,13 @@ module mips_pipe_xfer (
 	wire LO = !reset & C[5:3] == 3'b100;		/* load op	*/
 	wire SO = !reset & C[5:3] == 3'b101;		/* store op	*/
 
+	wire [3:0] BM = C[1] ? 15 : C[0] ? 3 : 1;	/* byte mask	*/
+
 	always @(posedge clock) begin
 		result  <= SO ? T : 32'b0;
 		target  <= LO ? rt : 0;
-		SM      <= SO ? C[1] ? 15 : C[0] ? 3 : 1 : 0;
-		LM      <= LO ? C[1] ? 15 : C[0] ? 3 : 1 : 0;
+		SM      <= SO ? BM : 0;
+		LM      <= LO ? BM : 0;
 		SE      <= !C[2];
 	end
 
