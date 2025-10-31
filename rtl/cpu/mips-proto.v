@@ -1,5 +1,5 @@
 /*
- * MIPS I Core Module
+ * MIPS I Core Prototype
  *
  * Copyright (c) 2021-2025 Alexei A. Smekalkine <ikle@ikle.ru>
  *
