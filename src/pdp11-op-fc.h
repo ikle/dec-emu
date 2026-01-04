@@ -22,8 +22,7 @@ static inline int pdp_trap (struct pdp *o, int vec)
 
 static inline int pdp_rti (struct pdp *o)
 {
-	return	pdp_pop (o, o->R + 7)				&&
-		pdp_pop (o, &o->PS);
+	return pdp_pop (o, o->R + 7) && pdp_pop (o, &o->PS);
 }
 
 static inline int pdp_sys (struct pdp *o, int op)
@@ -51,8 +50,7 @@ static inline int pdp_rts (struct pdp *o, int op)
 {
 	const int x = BITS (op, 0, 3);
 
-	return	pdp_wbg (o, 7, o->R[x])				&&
-		pdp_pop (o, o->R + x);
+	return pdp_wbg (o, 7, o->R[x]) && pdp_pop (o, o->R + x);
 }
 
 static inline int pdp_bcc (struct pdp *o, int op, int B)
