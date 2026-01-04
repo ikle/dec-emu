@@ -9,8 +9,8 @@
 #ifndef PDP11_OP_FC_H
 #define PDP11_OP_FC_H  1
 
-#include "pdp11-core.h"
 #include "pdp11-ex.h"
+#include "pdp11-op-mem.h"
 
 static inline int pdp_trap (struct pdp *o, int vec)
 {
@@ -41,10 +41,10 @@ static inline int pdp_sys (struct pdp *o, int op)
 
 static inline int pdp_jmp (struct pdp *o, int op)
 {
-	int y, D, A;
+	if ((op & 070) == 0)
+		return pdp_trap (o, 010);
 
-	return	pdp_pull (o, op, 2, &y, &D, &A)			&&
-		D ? pdp_trap (o, 010) : pdp_wbg (o, 7, A);
+	return pdp_lda (o, op, 0) && pdp_wbg (o, 7, o->A);
 }
 
 static inline int pdp_rts (struct pdp *o, int op)
@@ -64,12 +64,15 @@ static inline int pdp_bcc (struct pdp *o, int op, int B)
 
 static inline int pdp_jsr (struct pdp *o, int op)
 {
-	int x = BITS (op, 6, 3), y, D, A;
+	int x = BITS (op, 6, 3);
 
-	return	pdp_pull (o, op, 2, &y, &D, &A)			&&
+	if ((op & 070) == 0)
+		return pdp_trap (o, 010);
+
+	return	pdp_lda  (o, op, 0)				&&
 		pdp_push (o, o->R[x])				&&
 		pdp_wbg  (o, x, o->R[7])			&&
-		D ? pdp_trap (o, 010) : pdp_wbg (o, 7, A);
+		pdp_wbg  (o, 7, o->A);
 }
 
 static inline int pdp_srv (struct pdp *o, int op, int B)
