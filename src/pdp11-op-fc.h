@@ -11,15 +11,15 @@
 
 static inline int pdp_trap (struct pdp *o, int vec)
 {
-	return	pdp_push (o, o->PS)		&&
-		pdp_push (o, o->R[7])		&&
-		pdp_read (o, vec, o->R + 7)	&&
+	return	pdp_push (o, o->PS)				&&
+		pdp_push (o, o->R[7])				&&
+		pdp_read (o, vec, o->R + 7)			&&
 		pdp_read (o, vec + 2, &o->PS);
 }
 
 static inline int pdp_rti (struct pdp *o)
 {
-	return	pdp_pop (o, o->R + 7)	&&
+	return	pdp_pop (o, o->R + 7)				&&
 		pdp_pop (o, &o->PS);
 }
 
@@ -35,10 +35,10 @@ static inline int pdp_sys (struct pdp *o, int op)
 
 static inline int pdp_jmp (struct pdp *o, int op)
 {
-	int D, WD, WA;
+	int y, D, A;
 
-	return	pdp_pull (o, op, 2, &D, &WD, &WA)		&&
-		WD ? pdp_trap (o, 010) : pdp_wbg (o, 7, WA);
+	return	pdp_pull (o, op, 2, &y, &D, &A)			&&
+		D ? pdp_trap (o, 010) : pdp_wbg (o, 7, A);
 }
 
 static inline int pdp_rts (struct pdp *o, int op)
@@ -59,12 +59,12 @@ static inline int pdp_bcc (struct pdp *o, int op, int B)
 
 static inline int pdp_jsr (struct pdp *o, int op)
 {
-	int x = BITS (op, 6, 3), D, WD, WA;
+	int x = BITS (op, 6, 3), y, D, A;
 
-	return	pdp_pull (o, op, 2, &D, &WD, &WA)		&&
+	return	pdp_pull (o, op, 2, &y, &D, &A)			&&
 		pdp_push (o, o->R[x])				&&
 		pdp_wbg  (o, x, o->R[7])			&&
-		WD ? pdp_trap (o, 010) : pdp_wbg (o, 7, WA);
+		D ? pdp_trap (o, 010) : pdp_wbg (o, 7, A);
 }
 
 static inline int pdp_srv (struct pdp *o, int op, int B)
