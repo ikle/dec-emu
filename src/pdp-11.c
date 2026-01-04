@@ -8,12 +8,6 @@
 
 #include "pdp11-core.h"
 
-#define pdp_read_c(o, A, x) \
-	do { if (!pdp_read (o, A, x))  return 0; } while (0)
-
-#define pdp_push_c(o, x) \
-	do { if (!pdp_push (o, x))  return 0; } while (0)
-
 static int pdp_load (struct pdp *o, int reg, int A, int *x, int *WD, int *WA)
 {
 	return (*WD = reg) ? *x = o->R[*WA = A], 1 : pdp_read (o, *WA = A, x);
