@@ -15,6 +15,14 @@ struct pdp {
 	int R[8], PS;
 };
 
+/*
+ * pdp_wbg   -- write-back to GPR
+ */
+static inline int pdp_wbg (struct pdp *o, int n, int x)
+{
+	return (o->R[n] = x, 1);
+}
+
 int pdp_read  (struct pdp *o, int A, int *x);
 int pdp_write (struct pdp *o, int A, int x, int size);
 
