@@ -25,9 +25,9 @@ static inline int pdp_step_z8 (struct pdp *o, int op)
 	case 2:
 	case 3:  return pdp_trap (o, 010);			/* SPL */
 	case 4:
-	case 5:  return pdp_clcc (&o->PS, op);			/* CLx */
+	case 5:  return pdp_clcc (o, op);			/* CLx */
 	case 6:
-	case 7:  return pdp_secc (&o->PS, op);			/* SEx */
+	case 7:  return pdp_secc (o, op);			/* SEx */
 	default: return pdp_swab (o, op);
 	}
 }
