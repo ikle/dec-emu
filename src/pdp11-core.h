@@ -18,7 +18,7 @@
 #endif
 
 struct pdp {
-	int R[8], PS;
+	int R[8], PS, reg, A, S[2];
 };
 
 /*
