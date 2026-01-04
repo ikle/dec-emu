@@ -67,7 +67,7 @@ static inline int pdp_dop (struct pdp *o, int op, int B)
 	const int fn = BITS (op, 12, 3);
 	int x, y, *ps = &o->PS, z;
 
-	B = (B && fn != 6);
+	B &= (fn != 6);
 
 	if (!pdp_fetch (o, op, B, 0, &x) || !pdp_fetch (o, op, B, 1, &y))
 		return 0;
