@@ -32,7 +32,7 @@ static inline int pdp_sys (struct pdp *o, int op)
 	case 3:  return pdp_trap (o, 014);			/* BPT   */
 	case 4:  return pdp_trap (o, 020);			/* IOT   */
 	case 5:  return 0;					/* RESET */
-	default: return 0;
+	default: return pdp_trap (o, 010);
 	}
 }
 
