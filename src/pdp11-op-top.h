@@ -23,7 +23,7 @@ static inline int pdp_step_z8 (struct pdp *o, int op)
 	case 0:  return pdp_rts (o, op);			/* RTS */
 	case 1:
 	case 2:
-	case 3:  return 0;					/* SPL */
+	case 3:  return pdp_trap (o, 010);			/* SPL */
 	case 4:
 	case 5:  return pdp_clcc (&o->PS, op);			/* CLx */
 	case 6:
@@ -45,7 +45,7 @@ static inline int pdp_step_x3 (struct pdp *o, int op, int B)
 	case 12:  return pdp_shift (o, op, B);
 	case 13:
 	case 14:
-	case 15:  return 0;
+	case 15:  return pdp_trap (o, 010);
 	}
 }
 
@@ -55,7 +55,7 @@ static inline int pdp_step (struct pdp *o, int op)
 
 	switch (fn) {
 	case  0:  return pdp_step_x3 (o, op, B);
-	case  7:  return 0;					/* exts */
+	case  7:  return pdp_trap (o, 010);			/* exts */
 	default:  return pdp_dop (o, op, B);
 	}
 }
