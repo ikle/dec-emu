@@ -6,40 +6,10 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#include <stddef.h>
-#include <stdint.h>
-
-#include "pdp11-ex.h"
-
-struct pdp {
-	int R[8], PS;
-};
-
-/*
- * pdp_wbg   -- write-back to GPR
- */
-static inline int pdp_wbg (struct pdp *o, int n, int x)
-{
-	return (o->R[n] = x, 1);
-}
-
-int pdp_read  (struct pdp *o, int A, int *x);
-int pdp_write (struct pdp *o, int A, int x, int size);
+#include "pdp11-core.h"
 
 #define pdp_read_c(o, A, x) \
 	do { if (!pdp_read (o, A, x))  return 0; } while (0)
-
-static inline int pdp_push (struct pdp *o, int x)
-{
-	return pdp_write (o, o->R[6] -= 2, x, 2);
-}
-
-static inline int pdp_pop (struct pdp *o, int *x)
-{
-	const int A = o->R[6];
-
-	return o->R[6] += 2, pdp_read (o, A, x);
-}
 
 #define pdp_push_c(o, x) \
 	do { if (!pdp_push (o, x))  return 0; } while (0)
@@ -55,13 +25,6 @@ static int pdp_load (struct pdp *o, int reg, int A, int *x, int *WD, int *WA)
 static int pdp_store (struct pdp *o, int reg, int A, int x, int size)
 {
 	return reg ? o->R[A] = x, 1 : pdp_write (o, A, x, size);
-}
-
-static int pdp_next (struct pdp *o, int *x)
-{
-	const int A = o->R[7];
-
-	return o->R[7] += 2, pdp_read (o, A, x);
 }
 
 #define pdp_next_c(o, x) \

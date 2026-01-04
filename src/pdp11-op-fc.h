@@ -9,6 +9,9 @@
 #ifndef PDP11_OP_FC_H
 #define PDP11_OP_FC_H  1
 
+#include "pdp11-core.h"
+#include "pdp11-ex.h"
+
 static inline int pdp_trap (struct pdp *o, int vec)
 {
 	return	pdp_push (o, o->PS)				&&
