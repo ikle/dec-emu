@@ -39,8 +39,7 @@ static inline int pdp_jmp (struct pdp *o, int op)
 
 	pdp_pull_c (o, op, 2, &D, &WD, &WA);
 
-	o->R[7] = D;
-	return 1;
+	return WD ? pdp_trap (o, 010) : (o->R[7] = WA, 1);
 }
 
 static inline int pdp_rts (struct pdp *o, int op)
@@ -67,8 +66,7 @@ static inline int pdp_jsr (struct pdp *o, int op)
 	pdp_push_c (o, o->R[x]);
 
 	o->R[x] = o->R[7];
-	o->R[7] = D;
-	return 1;
+	return WD ? pdp_trap (o, 010) : (o->R[7] = WA, 1);
 }
 
 static inline int pdp_srv (struct pdp *o, int op, int B)
