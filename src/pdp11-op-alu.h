@@ -23,20 +23,20 @@ static inline int pdp_swab (struct pdp *o, int op)
 static inline int pdp_sop (struct pdp *o, int op, int B)
 {
 	const int fn = BITS (op, 6, 3), C = BIT (o->PS, 0);
-	int D, *ps = &o->PS, z;
+	int y, *ps = &o->PS, z;
 
-	if (!pdp_fetch (o, op, B, 1, &D))
+	if (!pdp_fetch (o, op, B, 1, &y))
 		return 0;
 
 	switch (fn) {
 	case 0:  z = pdp_add (ps, 0, 0, 0, 0, B, 1);  break;	/* CLR */
-	case 1:  z = pdp_add (ps, 0, D, 0, 1, B, 1);  break;	/* COM */
-	case 2:  z = pdp_add (ps, D, 0, 1, 0, B, 0);  break;	/* INC */
-	case 3:  z = pdp_add (ps, D, 0, 0, 1, B, 0);  break;	/* DEC */
-	case 4:  z = pdp_add (ps, 0, D, 1, 1, B, 1);  break;	/* NEG */
-	case 5:  z = pdp_add (ps, D, 0, C, 0, B, 1);  break;	/* ADC */
-	case 6:  z = pdp_add (ps, D, 0, 0, C, B, 1);  break;	/* SBC */
-	case 7:      pdp_add (ps, 0, D, 0, 0, B, 1);  return 1;	/* TST */
+	case 1:  z = pdp_add (ps, 0, y, 0, 1, B, 1);  break;	/* COM */
+	case 2:  z = pdp_add (ps, y, 0, 1, 0, B, 0);  break;	/* INC */
+	case 3:  z = pdp_add (ps, y, 0, 0, 1, B, 0);  break;	/* DEC */
+	case 4:  z = pdp_add (ps, 0, y, 1, 1, B, 1);  break;	/* NEG */
+	case 5:  z = pdp_add (ps, y, 0, C, 0, B, 1);  break;	/* ADC */
+	case 6:  z = pdp_add (ps, y, 0, 0, C, B, 1);  break;	/* SBC */
+	case 7:      pdp_add (ps, 0, y, 0, 0, B, 1);  return 1;	/* TST */
 	}
 
 	return pdp_commit (o, op, B, z);
@@ -45,18 +45,18 @@ static inline int pdp_sop (struct pdp *o, int op, int B)
 static inline int pdp_shift (struct pdp *o, int op, int B)
 {
 	const int fn = BITS (op, 6, 2);
-	int D, *ps = &o->PS, z;
+	int y, *ps = &o->PS, z;
 
-	if (!pdp_fetch (o, op, B, 1, &D))
+	if (!pdp_fetch (o, op, B, 1, &y))
 		return 0;
 
-	const int C = BIT (o->PS, 0), H = BIT (D, B ? 7 : 15);
+	const int C = BIT (o->PS, 0), H = BIT (y, B ? 7 : 15);
 
 	switch (fn) {
-	case 0:  z = pdp_shr (ps, D,    C,    B   );  break;	/* ROR */
-	case 1:  z = pdp_shl (ps, D,    C,    B   );  break;	/* ROL */
-	case 2:  z = pdp_shr (ps, D,    H,    B   );  break;	/* ASR */
-	case 3:  z = pdp_shl (ps, D,    0,    B   );  break;	/* ASL */
+	case 0:  z = pdp_shr (ps, y,    C,    B   );  break;	/* ROR */
+	case 1:  z = pdp_shl (ps, y,    C,    B   );  break;	/* ROL */
+	case 2:  z = pdp_shr (ps, y,    H,    B   );  break;	/* ASR */
+	case 3:  z = pdp_shl (ps, y,    0,    B   );  break;	/* ASL */
 	}
 
 	return pdp_commit (o, op, B, z);
@@ -65,20 +65,20 @@ static inline int pdp_shift (struct pdp *o, int op, int B)
 static inline int pdp_dop (struct pdp *o, int op, int B)
 {
 	const int fn = BITS (op, 12, 3);
-	int S, D, *ps = &o->PS, z;
+	int x, y, *ps = &o->PS, z;
 
 	B = (B && fn != 6);
 
-	if (!pdp_fetch (o, op, B, 0, &S) || !pdp_fetch (o, op, B, 1, &D))
+	if (!pdp_fetch (o, op, B, 0, &x) || !pdp_fetch (o, op, B, 1, &y))
 		return 0;
 
 	switch (fn) {
-	case 1:  z = pdp_or  (ps, S, 0,    0, B   );  break;	/* MOV */
-	case 2:      pdp_add (ps, S, D, 1, 1, B, 1);  return 1;	/* CMP */
-	case 3:      pdp_and (ps, S, D,    0, B   );  return 1;	/* BIT */
-	case 4:  z = pdp_and (ps, D, S,    1, B   );  break;	/* BIC */
-	case 5:  z = pdp_or  (ps, D, S,    0, B   );  break;	/* BIS */
-	case 6:  z = pdp_add (ps, D, S, B, B, 0, 1);  break;	/* ADD, SUB */
+	case 1:  z = pdp_or  (ps, x, 0,    0, B   );  break;	/* MOV */
+	case 2:      pdp_add (ps, x, y, 1, 1, B, 1);  return 1;	/* CMP */
+	case 3:      pdp_and (ps, x, y,    0, B   );  return 1;	/* BIT */
+	case 4:  z = pdp_and (ps, y, x,    1, B   );  break;	/* BIC */
+	case 5:  z = pdp_or  (ps, y, x,    0, B   );  break;	/* BIS */
+	case 6:  z = pdp_add (ps, y, x, B, B, 0, 1);  break;	/* ADD, SUB */
 	}
 
 	return pdp_commit (o, op, B, z);
