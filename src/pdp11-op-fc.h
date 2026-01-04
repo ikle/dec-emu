@@ -40,10 +40,9 @@ static inline int pdp_sys (struct pdp *o, int op)
 
 static inline int pdp_jmp (struct pdp *o, int op)
 {
-	if ((op & 070) == 0)
-		return pdp_trap (o, 010);
-
-	return pdp_lda (o, op, 0) && pdp_wbg (o, 7, o->A);
+	return	(op & 070) == 0 ? pdp_trap (o, 010)		:
+		pdp_lda (o, op, 0)				&&
+		pdp_wbg (o, 7, o->A);
 }
 
 static inline int pdp_rts (struct pdp *o, int op)
@@ -64,10 +63,8 @@ static inline int pdp_jsr (struct pdp *o, int op)
 {
 	int x = BITS (op, 6, 3);
 
-	if ((op & 070) == 0)
-		return pdp_trap (o, 010);
-
-	return	pdp_lda  (o, op, 0)				&&
+	return	(op & 070) == 0 ? pdp_trap (o, 010)		:
+		pdp_lda  (o, op, 0)				&&
 		pdp_push (o, o->R[x])				&&
 		pdp_wbg  (o, x, o->R[7])			&&
 		pdp_wbg  (o, 7, o->A);
