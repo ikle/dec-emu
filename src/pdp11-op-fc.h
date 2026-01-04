@@ -48,9 +48,9 @@ static inline int pdp_jmp (struct pdp *o, int op)
 
 static inline int pdp_rts (struct pdp *o, int op)
 {
-	const int x = BITS (op, 0, 3);
+	const int y = BITS (op, 0, 3);
 
-	return pdp_wbg (o, 7, o->R[x]) && pdp_pop (o, o->R + x);
+	return pdp_wbg (o, 7, o->R[y]) && pdp_pop (o, o->R + y);
 }
 
 static inline int pdp_bcc (struct pdp *o, int op, int B)
