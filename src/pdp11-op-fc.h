@@ -26,9 +26,12 @@ static inline int pdp_rti (struct pdp *o)
 static inline int pdp_sys (struct pdp *o, int op)
 {
 	switch (op) {
+	case 0:  return 0;					/* HALT  */
+	case 1:  return 0;					/* WAIT  */
 	case 2:  return pdp_rti  (o);				/* RTI */
 	case 3:  return pdp_trap (o, 014);			/* BPT */
 	case 4:  return pdp_trap (o, 020);			/* IOT */
+	case 5:  return 0;					/* RESET */
 	default: return 0;
 	}
 }
