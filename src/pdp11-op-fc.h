@@ -54,10 +54,9 @@ static inline int pdp_rts (struct pdp *o, int op)
 
 static inline int pdp_bcc (struct pdp *o, int op, int B)
 {
-	if (pdp_cond (o->PS, op, B))
-		o->R[7] += (int8_t) op * 2;
+	const int A = o->R[7] + (int8_t) op * 2;
 
-	return 1;
+	return pdp_cond (o->PS, op, B) ? pdp_wbg (o, 7, A) : 1;
 }
 
 static inline int pdp_jsr (struct pdp *o, int op)
