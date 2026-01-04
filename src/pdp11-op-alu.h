@@ -10,21 +10,23 @@
 #define PDP11_OP_ALU_H  1
 
 #include "pdp11-ex.h"
+#include "pdp11-op-mem.h"
 
 static inline int pdp_swab (struct pdp *o, int op)
 {
-	int D, WD, WA;
+	int y;
 
-	return pdp_pull (o, op, 2, &D, &WD, &WA) &&
-	       pdp_store (o, WD, WA, pdp_swap (&o->PS, D), 2);
+	return	pdp_fetch  (o, op, 0, 1, &y) &&
+		pdp_commit (o, op, 0, pdp_swap (&o->PS, y));
 }
 
 static inline int pdp_sop (struct pdp *o, int op, int B)
 {
 	const int fn = BITS (op, 6, 3), C = BIT (o->PS, 0);
-	int size = B ? 1 : 2, WD, WA, D, *ps = &o->PS, z;
+	int D, *ps = &o->PS, z;
 
-	pdp_pull_c (o, op, size, &D, &WD, &WA);
+	if (!pdp_fetch (o, op, B, 1, &D))
+		return 0;
 
 	switch (fn) {
 	case 0:  z = pdp_add (ps, 0, 0, 0, 0, B, 1);  break;	/* CLR */
@@ -37,15 +39,16 @@ static inline int pdp_sop (struct pdp *o, int op, int B)
 	case 7:      pdp_add (ps, 0, D, 0, 0, B, 1);  return 1;	/* TST */
 	}
 
-	return pdp_store (o, WD, WA, z, size);
+	return pdp_commit (o, op, B, z);
 }
 
 static inline int pdp_shift (struct pdp *o, int op, int B)
 {
-	const int fn = BITS (op, 6, 2), size = B ? 1 : 2;
-	int D, WD, WA, *ps = &o->PS, z;
+	const int fn = BITS (op, 6, 2);
+	int D, *ps = &o->PS, z;
 
-	pdp_pull_c (o, op, size, &D, &WD, &WA);
+	if (!pdp_fetch (o, op, B, 1, &D))
+		return 0;
 
 	const int C = BIT (o->PS, 0), H = BIT (D, B ? 7 : 15);
 
@@ -56,18 +59,18 @@ static inline int pdp_shift (struct pdp *o, int op, int B)
 	case 3:  z = pdp_shl (ps, D,    0,    B   );  break;	/* ASL */
 	}
 
-	return pdp_store (o, WD, WA, z, size);
+	return pdp_commit (o, op, B, z);
 }
 
 static inline int pdp_dop (struct pdp *o, int op, int B)
 {
 	const int fn = BITS (op, 12, 3);
-	int size, SD, SA, WD, WA, S, D, *ps = &o->PS, z;
+	int S, D, *ps = &o->PS, z;
 
-	size = (B && fn != 6) ? 1 : 2;
+	B = (B && fn != 6);
 
-	pdp_pull_c (o, op >> 6, size, &S, &SD, &SA);
-	pdp_pull_c (o, op     , size, &D, &WD, &WA);
+	if (!pdp_fetch (o, op, B, 0, &S) || !pdp_fetch (o, op, B, 1, &D))
+		return 0;
 
 	switch (fn) {
 	case 1:  z = pdp_or  (ps, S, 0,    0, B   );  break;	/* MOV */
@@ -78,7 +81,7 @@ static inline int pdp_dop (struct pdp *o, int op, int B)
 	case 6:  z = pdp_add (ps, D, S, B, B, 0, 1);  break;	/* ADD, SUB */
 	}
 
-	return pdp_store (o, WD, WA, z, size);
+	return pdp_commit (o, op, B, z);
 }
 
 #endif  /* PDP11_OP_ALU_H */

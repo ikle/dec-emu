@@ -16,11 +16,6 @@ static int pdp_load (struct pdp *o, int reg, int A, int *x, int *WD, int *WA)
 #define pdp_load_c(o, reg, A, x, WD, WA) \
 	do { if (!pdp_load (o, reg, A, x, WD, WA))  return 0; } while (0)
 
-static int pdp_store (struct pdp *o, int reg, int A, int x, int size)
-{
-	return reg ? o->R[A] = x, 1 : pdp_write (o, A, x, size);
-}
-
 #define pdp_next_c(o, x) \
 	do { if (!pdp_next (o, x))  return 0; } while (0)
 
