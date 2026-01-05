@@ -21,6 +21,9 @@ struct pdp {
 	int R[8], PS, reg, A, S[2];
 };
 
+int pdp_read  (struct pdp *o, int A, int *x);
+int pdp_write (struct pdp *o, int A, int x, int size);
+
 /*
  * pdp_wbg   -- write-back to GPR
  * pdp_push  -- push word into stack
@@ -31,9 +34,6 @@ static inline int pdp_wbg (struct pdp *o, int n, int x)
 {
 	return (o->R[n] = x, 1);
 }
-
-int pdp_read  (struct pdp *o, int A, int *x);
-int pdp_write (struct pdp *o, int A, int x, int size);
 
 static inline int pdp_push (struct pdp *o, int x)
 {
