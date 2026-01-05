@@ -23,6 +23,9 @@ struct pdp {
 
 /*
  * pdp_wbg   -- write-back to GPR
+ * pdp_push  -- push word into stack
+ * pdp_pop   -- pop word from stack
+ * pdp_next  -- pull next code word
  */
 static inline int pdp_wbg (struct pdp *o, int n, int x)
 {
