@@ -43,7 +43,7 @@ static inline int pdp_step_x3 (struct pdp *o, int op, int B)
 	case 10:
 	case 11:  return pdp_sop   (o, op, B);
 	case 12:  return pdp_shift (o, op, B);
-	case 13:
+	case 13:				/* MARK, MFPI, MTPI, SXT */
 	case 14:
 	case 15:  return pdp_trap (o, 010);
 	}
