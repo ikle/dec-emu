@@ -62,12 +62,10 @@ static inline int pdp_shift (struct pdp *o, int op, int B)
 	return pdp_commit (o, op, B, z);
 }
 
-static inline int pdp_dop (struct pdp *o, int op, int B)
+static inline int pdp_dop (struct pdp *o, int op, int H)
 {
-	const int fn = BITS (op, 12, 3);
+	const int fn = BITS (op, 12, 3), B = H & (fn != 6);
 	int x, y, z;
-
-	B &= (fn != 6);
 
 	if (!pdp_fetch (o, op, B, 0, &x) || !pdp_fetch (o, op, B, 1, &y))
 		return 0;
@@ -78,7 +76,7 @@ static inline int pdp_dop (struct pdp *o, int op, int B)
 	case 3:      pdp_and (o, x, y,    0, B   );  return 1;	/* BIT */
 	case 4:  z = pdp_and (o, y, x,    1, B   );  break;	/* BIC */
 	case 5:  z = pdp_or  (o, y, x,    0, B   );  break;	/* BIS */
-	case 6:  z = pdp_add (o, y, x, B, B, 0, 1);  break;	/* ADD, SUB */
+	case 6:  z = pdp_add (o, y, x, H, H, B, 1);  break;	/* ADD, SUB */
 	}
 
 	return pdp_commit (o, op, B, z);
