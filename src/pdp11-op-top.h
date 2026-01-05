@@ -38,8 +38,8 @@ static inline int pdp_step_x3 (struct pdp *o, int op, int B)
 
 	switch (fn) {
 	default:  return op < 256 ? pdp_step_z8 (o, op) : pdp_bcc (o, op, B);
-	case  8:
-	case  9:  return pdp_srv   (o, op, B);
+	case  8:  return pdp_srv   (o, op, B, 0);
+	case  9:  return pdp_srv   (o, op, B, 1);
 	case 10:
 	case 11:  return pdp_sop   (o, op, B);
 	case 12:  return pdp_shift (o, op, B);

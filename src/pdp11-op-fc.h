@@ -70,9 +70,9 @@ static inline int pdp_jsr (struct pdp *o, int op)
 		pdp_wbg  (o, 7, o->A);
 }
 
-static inline int pdp_srv (struct pdp *o, int op, int B)
+static inline int pdp_srv (struct pdp *o, int op, int B, int F)
 {
-	return B ? pdp_trap (o, BIT (op, 8) ? 034 : 030) : pdp_jsr (o, op);
+	return B ? pdp_trap (o, F ? 034 : 030) : pdp_jsr (o, op);
 }
 
 #endif  /* PDP11_OP_FC_H */
