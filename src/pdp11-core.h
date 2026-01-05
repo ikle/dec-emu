@@ -34,21 +34,23 @@ int pdp_write (struct pdp *o, int A, int x, int size);
 
 static inline int pdp_push (struct pdp *o, int x)
 {
-	return pdp_write (o, o->R[6] -= 2, x, 2);
+	const int A = o->R[6];
+
+	return pdp_write (o, A - 2, x, 2) && pdp_wbg (o, 6, A - 2);
 }
 
 static inline int pdp_pop (struct pdp *o, int *x)
 {
 	const int A = o->R[6];
 
-	return o->R[6] += 2, pdp_read (o, A, x);
+	return pdp_read (o, A, x) && pdp_wbg (o, 6, A + 2);
 }
 
 static inline int pdp_next (struct pdp *o, int *x)
 {
 	const int A = o->R[7];
 
-	return o->R[7] += 2, pdp_read (o, A, x);
+	return pdp_read (o, A, x) && pdp_wbg (o, 7, A + 2);
 }
 
 #endif  /* PDP11_CORE_H */
