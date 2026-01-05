@@ -16,7 +16,7 @@ static inline int pdp_swab (struct pdp *o, int op)
 {
 	int y;
 
-	return	pdp_fetch  (o, op, 0, 1, &y) &&
+	return	pdp_fetch  (o, op, 0, 1, &y)			&&
 		pdp_commit (o, op, 0, pdp_swap (o, y));
 }
 
