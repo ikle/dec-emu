@@ -30,10 +30,10 @@ static inline int pdp_lda (struct pdp *o, int op, int B)
 		return 1;
 	case 020:					/* (R)+ or @(R)+ */
 		o->A = R;
-		return pdp_dra (o, op) && pdp_wb (o, i, R + size);
+		return pdp_dra (o, op) && pdp_put (o, i, R + size);
 	case 040:					/* -(R) or @-(R) */
 		o->A = R - size;
-		return pdp_dra (o, op) && pdp_wb (o, i, R - size);
+		return pdp_dra (o, op) && pdp_put (o, i, R - size);
 	case 060:					/* X(R) or @X(R) */
 		if (!pdp_next (o, &X))
 			return 0;
@@ -56,7 +56,7 @@ static inline int pdp_commit (struct pdp *o, int op, int B, int z)
 {
 	const int i = op & 7, byte = B && (i & 6) != 6;
 
-	return o->reg ? pdp_wb (o, i, z) : pdp_write (o, o->A, z, byte);
+	return o->reg ? pdp_put (o, i, z) : pdp_write (o, o->A, z, byte);
 }
 
 #endif  /* PDP11_OP_MEM_H */
