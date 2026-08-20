@@ -25,11 +25,18 @@ int pdp_read  (struct pdp *o, int A, int *x);
 int pdp_write (struct pdp *o, int A, int x, int B);
 
 /*
+ * pdp_get   -- read from GPR
  * pdp_wb    -- write-back to GPR
  * pdp_push  -- push word into stack
  * pdp_pop   -- pop word from stack
  * pdp_next  -- pull next code word
  */
+
+static inline int pdp_get (struct pdp *o, int n, int *x)
+{
+	return (*x = o->R[n], 1);
+}
+
 static inline int pdp_wb (struct pdp *o, int n, int x)
 {
 	return (o->R[n] = x, 1);
