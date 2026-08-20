@@ -48,7 +48,7 @@ static inline int pdp_fetch (struct pdp *o, int op, int B, int n, int *x)
 	op = (n == 0 ? op >> 6 : op);
 	o->reg = ((op & 070) == 0);
 
-	return o->reg ? (*x = o->R[op & 7], 1) :
+	return o->reg ? pdp_get (o, op & 7, x) :
 			pdp_lda (o, op, B) && pdp_read (o, o->A, x);
 }
 
