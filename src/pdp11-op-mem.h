@@ -43,9 +43,9 @@ static inline int pdp_lda (struct pdp *o, int op, int B)
 	}
 }
 
-static inline int pdp_ld (struct pdp *o, int op, int B, int n)
+static inline int pdp_ld (struct pdp *o, int op, int B, int *x)
 {
-	return pdp_lda (o, op, B) && pdp_read (o, o->A, o->S + n);
+	return pdp_lda (o, op, B) && pdp_read (o, o->A, x);
 }
 
 static inline int pdp_fetch (struct pdp *o, int op, int B, int n, int *x)
@@ -55,7 +55,7 @@ static inline int pdp_fetch (struct pdp *o, int op, int B, int n, int *x)
 	if ((op & 070) == 0)
 		return o->reg = 1, *x = o->R[op & 7], 1;
 
-	return pdp_ld (o, op, B, n) && (o->reg = 0, *x = o->S[n], 1);
+	return o->reg = 0, pdp_ld (o, op, B, x);
 }
 
 static inline int pdp_commit (struct pdp *o, int op, int B, int z)

@@ -18,7 +18,7 @@
 #endif
 
 struct pdp {
-	int R[8], PS, reg, A, S[2];
+	int R[8], PS, reg, A;
 };
 
 int pdp_read  (struct pdp *o, int A, int *x);
