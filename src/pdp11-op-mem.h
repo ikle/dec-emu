@@ -58,11 +58,11 @@ static inline int pdp_fetch (struct pdp *o, int op, int B, int n, int *x)
 	return pdp_ld (o, op, B, n) && (o->reg = 0, *x = o->S[n], 1);
 }
 
-static inline int pdp_commit (struct pdp *o, int op, int B, int x)
+static inline int pdp_commit (struct pdp *o, int op, int B, int z)
 {
 	const int i = op & 7, size = B && (i & 6) != 6 ? 1 : 2;
 
-	return o->reg ? pdp_wb (o, i, x) : pdp_write (o, o->A, x, size);
+	return o->reg ? pdp_wb (o, i, z) : pdp_write (o, o->A, z, size);
 }
 
 #endif  /* PDP11_OP_MEM_H */
