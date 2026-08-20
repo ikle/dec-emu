@@ -42,21 +42,21 @@ static inline int pdp_jmp (struct pdp *o, int op)
 {
 	return	(op & 070) == 0 ? pdp_trap (o, 010)		:
 		pdp_lda (o, op, 0)				&&
-		pdp_wbg (o, 7, o->A);
+		pdp_wb  (o, 7, o->A);
 }
 
 static inline int pdp_rts (struct pdp *o, int op)
 {
 	const int y = BITS (op, 0, 3);
 
-	return pdp_wbg (o, 7, o->R[y]) && pdp_pop (o, o->R + y);
+	return pdp_wb (o, 7, o->R[y]) && pdp_pop (o, o->R + y);
 }
 
 static inline int pdp_bcc (struct pdp *o, int op, int B)
 {
 	const int A = o->R[7] + (int8_t) op * 2;
 
-	return pdp_cond (o, op, B) ? pdp_wbg (o, 7, A) : 1;
+	return pdp_cond (o, op, B) ? pdp_wb (o, 7, A) : 1;
 }
 
 static inline int pdp_jsr (struct pdp *o, int op)
@@ -66,8 +66,8 @@ static inline int pdp_jsr (struct pdp *o, int op)
 	return	(op & 070) == 0 ? pdp_trap (o, 010)		:
 		pdp_lda  (o, op, 0)				&&
 		pdp_push (o, o->R[x])				&&
-		pdp_wbg  (o, x, o->R[7])			&&
-		pdp_wbg  (o, 7, o->A);
+		pdp_wb   (o, x, o->R[7])			&&
+		pdp_wb   (o, 7, o->A);
 }
 
 static inline int pdp_srv (struct pdp *o, int op, int B, int F)
