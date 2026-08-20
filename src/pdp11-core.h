@@ -22,7 +22,7 @@ struct pdp {
 };
 
 int pdp_read  (struct pdp *o, int A, int *x);
-int pdp_write (struct pdp *o, int A, int x, int size);
+int pdp_write (struct pdp *o, int A, int x, int B);
 
 /*
  * pdp_wb    -- write-back to GPR
@@ -39,7 +39,7 @@ static inline int pdp_push (struct pdp *o, int x)
 {
 	const int A = o->R[6];
 
-	return pdp_write (o, A - 2, x, 2) && pdp_wb (o, 6, A - 2);
+	return pdp_write (o, A - 2, x, 0) && pdp_wb (o, 6, A - 2);
 }
 
 static inline int pdp_pop (struct pdp *o, int *x)
