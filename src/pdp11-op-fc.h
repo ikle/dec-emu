@@ -12,12 +12,19 @@
 #include "pdp11-ex.h"
 #include "pdp11-op-mem.h"
 
+static inline int pdp_read_at (struct pdp *o, int A, int *x)
+{
+	o->A = A;
+
+	return pdp_read (o, x);
+}
+
 static inline int pdp_trap (struct pdp *o, int vec)
 {
 	return	pdp_push (o, o->PS)				&&
 		pdp_push (o, o->R[7])				&&
-		pdp_read (o, vec, o->R + 7)			&&
-		pdp_read (o, vec | 2, &o->PS);
+		pdp_read_at (o, vec, o->R + 7)			&&
+		pdp_read_at (o, vec | 2, &o->PS);
 }
 
 static inline int pdp_rti (struct pdp *o)

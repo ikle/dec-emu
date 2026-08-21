@@ -21,7 +21,7 @@ struct pdp {
 	int R[8], PS, reg, A;
 };
 
-int pdp_read  (struct pdp *o, int A, int *x);
+int pdp_read  (struct pdp *o, int *x);
 int pdp_write (struct pdp *o, int x, int B);
 
 /*
@@ -53,14 +53,14 @@ static inline int pdp_pop (struct pdp *o, int *x)
 {
 	o->A = o->R[6];
 
-	return pdp_read (o, o->A, x) && pdp_put (o, 6, o->A + 2);
+	return pdp_read (o, x) && pdp_put (o, 6, o->A + 2);
 }
 
 static inline int pdp_next (struct pdp *o, int *x)
 {
 	o->A = o->R[7];
 
-	return pdp_read (o, o->A, x) && pdp_put (o, 7, o->A + 2);
+	return pdp_read (o, x) && pdp_put (o, 7, o->A + 2);
 }
 
 #endif  /* PDP11_CORE_H */
