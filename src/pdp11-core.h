@@ -51,16 +51,16 @@ static inline int pdp_push (struct pdp *o, int x)
 
 static inline int pdp_pop (struct pdp *o, int *x)
 {
-	const int A = o->R[6];
+	o->A = o->R[6];
 
-	return pdp_read (o, A, x) && pdp_put (o, 6, A + 2);
+	return pdp_read (o, o->A, x) && pdp_put (o, 6, o->A + 2);
 }
 
 static inline int pdp_next (struct pdp *o, int *x)
 {
-	const int A = o->R[7];
+	o->A = o->R[7];
 
-	return pdp_read (o, A, x) && pdp_put (o, 7, A + 2);
+	return pdp_read (o, o->A, x) && pdp_put (o, 7, o->A + 2);
 }
 
 #endif  /* PDP11_CORE_H */
