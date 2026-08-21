@@ -79,7 +79,7 @@ static inline int pdp_dop (struct pdp *o, int op, int H)
 	case 6:  z = pdp_add (o, y, x, H, H, B, 1);  break;	/* ADD, SUB */
 	}
 
-	return pdp_commit (o, op, B, z, y);
+	return pdp_commit (o, op, B, z, fn == 1 ? (int8_t) y : y);
 }
 
 #endif  /* PDP11_OP_ALU_H */
