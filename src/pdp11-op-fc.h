@@ -17,7 +17,7 @@ static inline int pdp_trap (struct pdp *o, int vec)
 	return	pdp_push (o, o->PS)				&&
 		pdp_push (o, o->R[7])				&&
 		pdp_read (o, vec, o->R + 7)			&&
-		pdp_read (o, vec + 2, &o->PS);
+		pdp_read (o, vec | 2, &o->PS);
 }
 
 static inline int pdp_rti (struct pdp *o)
