@@ -54,7 +54,7 @@ static inline int pdp_step (struct pdp *o, int op)
 	const int B = (op < 0), fn = BITS (op, 12, 3);
 
 	switch (fn) {
-	case  0:  return pdp_step_x3 (o, op, B);
+	case  0:  return pdp_step_x3 (o, (uint16_t) op, B);
 	case  7:  return pdp_trap (o, 010);			/* exts */
 	default:  return pdp_dop (o, op, B);
 	}
