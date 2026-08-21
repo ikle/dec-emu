@@ -22,7 +22,7 @@ struct pdp {
 };
 
 int pdp_read  (struct pdp *o, int A, int *x);
-int pdp_write (struct pdp *o, int A, int x, int B);
+int pdp_write (struct pdp *o, int x, int B);
 
 /*
  * pdp_get   -- read from GPR
@@ -44,9 +44,9 @@ static inline int pdp_put (struct pdp *o, int n, int x)
 
 static inline int pdp_push (struct pdp *o, int x)
 {
-	const int A = o->R[6];
+	o->A = o->R[6] - 2;
 
-	return pdp_write (o, A - 2, x, 0) && pdp_put (o, 6, A - 2);
+	return pdp_write (o, x, 0) && pdp_put (o, 6, o->A);
 }
 
 static inline int pdp_pop (struct pdp *o, int *x)

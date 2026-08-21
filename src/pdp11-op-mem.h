@@ -57,7 +57,7 @@ static inline int pdp_commit (struct pdp *o, int op, int B, int z, int y)
 	const int i = op & 7, byte = B && (i & 6) != 6;
 	const int v = B ? (y & ~0177) | (z & 0177) : z;
 
-	return o->reg ? pdp_put (o, i, v) : pdp_write (o, o->A, z, byte);
+	return o->reg ? pdp_put (o, i, v) : pdp_write (o, z, byte);
 }
 
 #endif  /* PDP11_OP_MEM_H */
