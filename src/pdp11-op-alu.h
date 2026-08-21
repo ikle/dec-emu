@@ -17,7 +17,7 @@ static inline int pdp_swab (struct pdp *o, int op)
 	int y;
 
 	return	pdp_fetch  (o, op, 0, 1, &y)			&&
-		pdp_commit (o, op, 0, pdp_swap (o, y));
+		pdp_commit (o, op, 0, pdp_swap (o, y), y);
 }
 
 static inline int pdp_sop (struct pdp *o, int op, int B)
@@ -39,7 +39,7 @@ static inline int pdp_sop (struct pdp *o, int op, int B)
 	case 7:      pdp_add (o, 0, y, 0, 0, B, 1);  return 1;	/* TST */
 	}
 
-	return pdp_commit (o, op, B, z);
+	return pdp_commit (o, op, B, z, y);
 }
 
 static inline int pdp_shift (struct pdp *o, int op, int B)
@@ -59,7 +59,7 @@ static inline int pdp_shift (struct pdp *o, int op, int B)
 	case 3:  z = pdp_shl (o, y,    0,    B   );  break;	/* ASL */
 	}
 
-	return pdp_commit (o, op, B, z);
+	return pdp_commit (o, op, B, z, y);
 }
 
 static inline int pdp_dop (struct pdp *o, int op, int H)
@@ -79,7 +79,7 @@ static inline int pdp_dop (struct pdp *o, int op, int H)
 	case 6:  z = pdp_add (o, y, x, H, H, B, 1);  break;	/* ADD, SUB */
 	}
 
-	return pdp_commit (o, op, B, z);
+	return pdp_commit (o, op, B, z, y);
 }
 
 #endif  /* PDP11_OP_ALU_H */
