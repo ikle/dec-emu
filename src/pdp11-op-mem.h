@@ -18,7 +18,7 @@ static inline int pdp_dra (struct pdp *o, int op)
 
 static inline int pdp_lda (struct pdp *o, int op, int B)
 {
-	const int i = op & 7, R = o->R[i], size = B && (i & 6) != 6 ? 1 : 2;
+	const int i = op & 7, size = B && (i & 6) != 6 ? 1 : 2;
 	int X;
 
 	if ((op & 070) == 0)				/* R */
@@ -26,20 +26,19 @@ static inline int pdp_lda (struct pdp *o, int op, int B)
 
 	switch (op & 060) {
 	default:					/* (R)           */
-		o->A = R;
-		return 1;
+		return pdp_addr (o, i, 0);
 	case 020:					/* (R)+ or @(R)+ */
-		o->A = R;
-		return pdp_put (o, i, R + size) && pdp_dra (o, op);
+		return pdp_addr (o, i, 0)	&&
+		       pdp_put  (o, i, o->A + size) &&
+		       pdp_dra  (o, op);
 	case 040:					/* -(R) or @-(R) */
-		o->A = R - size;
-		return pdp_put (o, i, R - size) && pdp_dra (o, op);
+		return pdp_addr (o, i, -size)	&&
+		       pdp_put  (o, i, o->A)	&&
+		       pdp_dra  (o, op);
 	case 060:					/* X(R) or @X(R) */
-		if (!pdp_next (o, &X))
-			return 0;
-
-		o->A = R + X;
-		return pdp_dra (o, op);
+		return pdp_next (o, &X)		&&
+		       pdp_addr (o, i, X)	&&
+		       pdp_dra  (o, op);
 	}
 }
 
