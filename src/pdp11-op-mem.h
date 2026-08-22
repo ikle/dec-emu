@@ -43,9 +43,8 @@ static inline int pdp_lda (struct pdp *o, int op, int B)
 	}
 }
 
-static inline int pdp_fetch (struct pdp *o, int op, int B, int n, int *x)
+static inline int pdp_fetch (struct pdp *o, int op, int B, int *x)
 {
-	op = (n == 0 ? op >> 6 : op);
 	o->reg = ((op & 070) == 0);
 
 	return o->reg ? pdp_get (o, op & 7, x) :

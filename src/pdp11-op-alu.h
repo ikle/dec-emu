@@ -16,7 +16,7 @@ static inline int pdp_swab (struct pdp *o, int op)
 {
 	int y;
 
-	return	pdp_fetch  (o, op, 0, 1, &y)			&&
+	return	pdp_fetch  (o, op, 0, &y)			&&
 		pdp_commit (o, op, 0, pdp_swap (o, y), y);
 }
 
@@ -25,7 +25,7 @@ static inline int pdp_sop (struct pdp *o, int op, int B)
 	const int fn = BITS (op, 6, 3), C = BIT (o->PS, 0);
 	int y, z;
 
-	if (!pdp_fetch (o, op, B, 1, &y))
+	if (!pdp_fetch (o, op, B, &y))
 		return 0;
 
 	switch (fn) {
@@ -47,7 +47,7 @@ static inline int pdp_shift (struct pdp *o, int op, int B)
 	const int fn = BITS (op, 6, 2);
 	int y, z;
 
-	if (!pdp_fetch (o, op, B, 1, &y))
+	if (!pdp_fetch (o, op, B, &y))
 		return 0;
 
 	const int C = BIT (o->PS, 0), H = BIT (y, B ? 7 : 15);
@@ -67,7 +67,7 @@ static inline int pdp_dop (struct pdp *o, int op, int H)
 	const int fn = BITS (op, 12, 3), B = H & (fn != 6);
 	int x, y, z;
 
-	if (!pdp_fetch (o, op, B, 0, &x) || !pdp_fetch (o, op, B, 1, &y))
+	if (!pdp_fetch (o, op >> 6, B, &x) || !pdp_fetch (o, op, B, &y))
 		return 0;
 
 	switch (fn) {
