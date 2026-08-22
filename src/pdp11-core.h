@@ -51,19 +51,19 @@ static inline int pdp_put (struct pdp *o, int n, int x)
 static inline int pdp_push (struct pdp *o, int x)
 {
 	return pdp_addr (o, 6, -2) && pdp_write (o, x, 0) &&
-	       pdp_put (o, 6, o->A);
+	       pdp_put  (o, 6, o->A);
 }
 
 static inline int pdp_pop (struct pdp *o, int *x)
 {
 	return pdp_addr (o, 6, 0) && pdp_read (o, x) &&
-	       pdp_put (o, 6, o->A + 2);
+	       pdp_put  (o, 6, o->A + 2);
 }
 
 static inline int pdp_next (struct pdp *o, int *x)
 {
 	return pdp_addr (o, 7, 0) && pdp_read (o, x) &&
-	       pdp_put (o, 7, o->A + 2);
+	       pdp_put  (o, 7, o->A + 2);
 }
 
 #endif  /* PDP11_CORE_H */
