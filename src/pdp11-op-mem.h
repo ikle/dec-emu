@@ -53,7 +53,7 @@ static inline int pdp_fetch (struct pdp *o, int op, int B, int *x)
 static inline int pdp_commit (struct pdp *o, int op, int B, int z, int y)
 {
 	const int i = op & 7, byte = B && (i & 6) != 6;
-	const int v = B ? (y & ~0177) | (z & 0177) : z;
+	const int v = B ? (y & ~0377) | (z & 0377) : z;
 
 	return o->reg ? pdp_put (o, i, v) : pdp_write (o, z, byte);
 }
