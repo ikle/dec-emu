@@ -14,9 +14,7 @@
 
 static inline int pdp_read_at (struct pdp *o, int A, int *x)
 {
-	o->A = A;
-
-	return pdp_read (o, x);
+	return o->A = A, pdp_read (o, x);
 }
 
 static inline int pdp_trap (struct pdp *o, int vec)
