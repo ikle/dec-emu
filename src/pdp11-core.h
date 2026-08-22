@@ -25,12 +25,18 @@ int pdp_read  (struct pdp *o, int *x);
 int pdp_write (struct pdp *o, int x, int B);
 
 /*
+ * pdp_addr  -- read from GPR to address register and add displacement
  * pdp_get   -- read from GPR
  * pdp_put   -- write to GPR (write-back)
  * pdp_push  -- push word into stack
  * pdp_pop   -- pop word from stack
  * pdp_next  -- pull next code word
  */
+
+static inline int pdp_addr (struct pdp *o, int n, int disp)
+{
+	return (o->A = o->R[n] + disp, 1);
+}
 
 static inline int pdp_get (struct pdp *o, int n, int *x)
 {
